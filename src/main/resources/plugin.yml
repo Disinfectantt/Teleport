@@ -1,0 +1,35 @@
+name: Teleport
+version: 1.0.0
+main: xyz.cringee.Main
+api-version: 1.19
+
+permissions:
+  op.permission.node:
+    description: "This is a op node"
+    default: op
+
+  player.permission.node:
+    description: "This is a player node"
+    default: true
+
+commands:
+  tsetpoint:
+    description: "Set point at <x> <y> <z> <name>. if no coordinates are specified, it takes the current position of the player"
+    usage: "§c/tsetpoint <x> <y> <z> <name>"
+    aliases: [tsetpoint]
+    permission: op.permission.node
+    permission-message: "You do not have permission to use this command"
+  tdeletepoint:
+    description: "Delete point <name>."
+    usage: "§c/tdeletepoint <name>"
+    aliases: [ tdeletepoint ]
+    permission: op.permission.node
+    permission-message: "You do not have permission to use this command"
+  tmenu:
+    description: "Opens teleport menu"
+    usage: "§c/tmenu"
+    aliases: [ tmenu ]
+    permission: player.permission.node
+    permission-message: "You do not have permission to use this command"
+
+softdepend: [BlueMap]
