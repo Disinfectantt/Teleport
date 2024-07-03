@@ -11,60 +11,72 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import xyz.cringee.data.Json;
+import xyz.cringee.menu.gui.teleportMenu;
 import xyz.cringee.models.PlayersPagination;
 import xyz.cringee.models.Point;
-import xyz.cringee.menu.gui.teleportMenu;
 
 import java.util.List;
+import java.util.Objects;
 
 public class clickEvent implements Listener {
+    private static final PlayersPagination playersPagination = new PlayersPagination();
+    private static final teleportMenu teleportMenu = new teleportMenu();
+    private static final Json json = new Json();
+
     @EventHandler
-    public void inventoryClick(InventoryClickEvent e){
+    public void inventoryClick(InventoryClickEvent e) {
         String inventoryTitle = serializeComponent(e.getView().title());
-        if(inventoryTitle.equalsIgnoreCase("Click on the point")){
+        if (inventoryTitle.equalsIgnoreCase("Click on the point")) {
             e.setCancelled(true);
-            if(e.getCurrentItem() == null){
+            if (e.getCurrentItem() == null) {
                 return;
             }
             Component textComp = e.getCurrentItem().getItemMeta().displayName();
-            String serializedText = serializeComponent(textComp);
-
             if (textComp == null) {
                 return;
             }
+            String serializedText = serializeComponent(textComp);
             if (e.getCurrentItem().getType() == Material.GREEN_WOOL) {
-                Point point = Json.findPoint(serializedText);
-                if (point == null) {
-                    return;
-                }
-                double x = point.getX();
-                double y = point.getY();
-                double z = point.getZ();
-                Player player = (Player) e.getWhoClicked();
-                player.closeInventory();
-                List<World> listOfWorlds = Bukkit.getWorlds();
-                player.teleport(new Location(listOfWorlds.get(0), x, y, z));
+                teleportProcess(e, serializeComponent(Objects.requireNonNull(e.getCurrentItem().lore()).getFirst()));
             }
-
-            if (e.getCurrentItem().getType() == Material.ARROW){
-                if(serializedText.contains("Forward")){
-                    Player player = (Player) e.getWhoClicked();
-                    Integer page = PlayersPagination.getPageForPlayer(player.getUniqueId());
-                    page++;
-                    PlayersPagination.setPageForPlayer(player.getUniqueId(), page);
-                    teleportMenu.Menu(player);
-                }
-                if(serializedText.contains("Back")){
-                    Player player = (Player) e.getWhoClicked();
-                    Integer page = PlayersPagination.getPageForPlayer(player.getUniqueId());
-                    page--;
-                    PlayersPagination.setPageForPlayer(player.getUniqueId(), page);
-                    teleportMenu.Menu(player);
-                }
+            if (e.getCurrentItem().getType() == Material.ARROW) {
+                arrowsProcess(serializedText, e);
             }
         }
     }
-    public String serializeComponent(Component comp){
+
+    private String serializeComponent(Component comp) {
         return PlainTextComponentSerializer.plainText().serialize(comp);
+    }
+
+    private void teleportProcess(InventoryClickEvent e, String serializedText) {
+        Point point = json.findPoint(serializedText);
+        if (point == null) {
+            return;
+        }
+        double x = point.getX();
+        double y = point.getY();
+        double z = point.getZ();
+        Player player = (Player) e.getWhoClicked();
+        player.closeInventory();
+        List<World> listOfWorlds = Bukkit.getWorlds();
+        player.teleport(new Location(listOfWorlds.getFirst(), x, y, z));
+    }
+
+    private void arrowsProcess(String serializedText, InventoryClickEvent e) {
+        if (serializedText.contains("Forward")) {
+            Player player = (Player) e.getWhoClicked();
+            Integer page = playersPagination.getPageForPlayer(player.getUniqueId());
+            page++;
+            playersPagination.setPageForPlayer(player.getUniqueId(), page);
+            teleportMenu.Menu(player);
+        }
+        if (serializedText.contains("Back")) {
+            Player player = (Player) e.getWhoClicked();
+            Integer page = playersPagination.getPageForPlayer(player.getUniqueId());
+            page--;
+            playersPagination.setPageForPlayer(player.getUniqueId(), page);
+            teleportMenu.Menu(player);
+        }
     }
 }

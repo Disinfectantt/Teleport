@@ -15,16 +15,18 @@ public class BlueMapAPIMarkers {
     private static final MarkerSet markerSet = MarkerSet.builder()
             .label("Points")
             .build();
-    public static void markers(){
+
+    public static void markersOnEnable() {
         BlueMapAPI.onEnable(api -> {
             List<World> listOfWorlds = Bukkit.getWorlds();
+            Json json = new Json();
 
-            for (Point point : Json.returnAllPoints()){
+            for (Point point : json.returnAllPoints()) {
                 markerSet.getMarkers()
                         .put(point.getId(), createPOI(point));
             }
 
-            api.getWorld(listOfWorlds.get(0)).ifPresent(world -> {
+            api.getWorld(listOfWorlds.getFirst()).ifPresent(world -> {
                 for (BlueMapMap map : world.getMaps()) {
                     map.getMarkerSets().put("points", markerSet);
                 }
@@ -32,7 +34,7 @@ public class BlueMapAPIMarkers {
         });
     }
 
-    public static POIMarker createPOI(Point point){
+    public static POIMarker createPOI(Point point) {
         return POIMarker.builder()
                 .label(point.getName())
                 .position(point.getX(), point.getY(), point.getZ())
@@ -45,11 +47,11 @@ public class BlueMapAPIMarkers {
         return markerSet;
     }
 
-    public static void putMarkersSet(Point point){
-        getMarkerSet().put(point.getId(), BlueMapAPIMarkers.createPOI(point));
+    public static void putMarkersSet(Point point) {
+        getMarkerSet().put(point.getId(), createPOI(point));
     }
 
-    public static void deleteMarkerSet(Point point){
-        getMarkerSet().put(point.getId(), BlueMapAPIMarkers.createPOI(point));
+    public static void deleteMarkerSet(Point point) {
+        getMarkerSet().put(point.getId(), createPOI(point));
     }
 }

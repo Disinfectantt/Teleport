@@ -3,8 +3,8 @@ package xyz.cringee.models;
 import java.util.UUID;
 
 public class Point {
-    double x, y, z;
-    String name, id;
+    private double x, y, z;
+    private String name, id;
 
     public Point(double x, double y, double z, String name) {
         this.x = x;

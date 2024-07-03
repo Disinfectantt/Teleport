@@ -1,5 +1,7 @@
 package xyz.cringee.menu.gui;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -11,56 +13,67 @@ import org.bukkit.inventory.meta.ItemMeta;
 import xyz.cringee.data.Json;
 import xyz.cringee.models.PlayersPagination;
 import xyz.cringee.models.Point;
-import net.kyori.adventure.text.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class teleportMenu {
-    public static void Menu(Player player){
-        Inventory menu = Bukkit.createInventory(player, 54, Component.text("Click on the point", TextColor.color(0,102,26), TextDecoration.BOLD));
+    private static final Json json = new Json();
+    private final static Logger logger = Logger.getLogger("Minecraft");
+    private static final PlayersPagination playersPagination = new PlayersPagination();
+
+    public void Menu(Player player) {
+        Inventory menu = Bukkit.createInventory(player, 54, Component.text("Click on the point", TextColor.color(0, 102, 26), TextDecoration.BOLD));
         try {
-            Json.loadPoints();
-        }catch (IOException e){
-            Bukkit.getLogger().warning("Exception: " + e);
+            json.loadPoints();
+        } catch (IOException e) {
+            logger.warning("Exception: " + e);
         }
 
         int pages = numberOfPages();
-        int currentPage = PlayersPagination.getPageForPlayer(player.getUniqueId());
-        List<Point> points = Json.returnSomePoints(currentPage);
+        int currentPage = playersPagination.getPageForPlayer(player.getUniqueId());
+        List<Point> points = json.returnSomePoints(currentPage);
 
-        if(points.size() == 0){
-            menu.setItem(31, getBlock("Empty", Material.RED_WOOL, 255, 64, 0));
-        }else{
-            if (currentPage < 0){
+        if (points.isEmpty()) {
+            menu.setItem(31, getBlock("Empty", Material.RED_WOOL, NamedTextColor.RED, null));
+        } else {
+            if (currentPage < 0) {
                 currentPage = 0;
             }
-            if (currentPage > pages){
+            if (currentPage > pages) {
                 currentPage = pages;
             }
 
-            if(pages > 0 && currentPage != pages){
-                menu.setItem(50, getBlock("Forward " + currentPage + " / " + pages, Material.ARROW, 255, 255, 255));
+            if (pages > 0 && currentPage != pages) {
+                menu.setItem(50, getBlock("Forward " + currentPage + " / " + pages, Material.ARROW, NamedTextColor.WHITE, null));
             }
-            if(currentPage > 0){
-                menu.setItem(48, getBlock("Back " + currentPage + " / " + pages, Material.ARROW, 255, 255, 255));
+            if (currentPage > 0) {
+                menu.setItem(48, getBlock("Back " + currentPage + " / " + pages, Material.ARROW, NamedTextColor.WHITE, null));
             }
 
-            for (int i=0; i<points.size(); i++) {
-                menu.setItem(i, getBlock(points.get(i).getName(), Material.GREEN_WOOL, 255, 255, 255));
+            for (int i = 0; i < points.size(); i++) {
+                menu.setItem(i, getBlock(points.get(i).getName(), Material.GREEN_WOOL, NamedTextColor.WHITE, points.get(i).getId()));
             }
         }
         player.openInventory(menu);
     }
 
-    public static int numberOfPages(){
-        return Json.returnAllPoints().size()/46;
+    public int numberOfPages() {
+        return json.returnAllPoints().size() / 46;
     }
 
-    public static ItemStack getBlock(String name, Material material, int r, int g, int b){
+    public ItemStack getBlock(String name, Material material, NamedTextColor color, String id) {
         ItemStack item = new ItemStack(material, 1);
         ItemMeta itemMeta = item.getItemMeta();
-        itemMeta.displayName(Component.text(name, TextColor.color(r,g,b)));
+        itemMeta.displayName(Component.text(name, color));
+        if (id != null) {
+            List<Component> lore = new ArrayList<>(1);
+            Component c = Component.text(id, NamedTextColor.DARK_GRAY);
+            lore.add(c);
+            itemMeta.lore(lore);
+        }
         item.setItemMeta(itemMeta);
         return item;
     }

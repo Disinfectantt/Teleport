@@ -1,7 +1,7 @@
 name: Teleport
 version: 1.0.0
 main: xyz.cringee.Main
-api-version: 1.19
+api-version: 1.21
 
 permissions:
   op.permission.node:
@@ -16,7 +16,7 @@ commands:
   tsetpoint:
     description: "Set point at <x> <y> <z> <name>. if no coordinates are specified, it takes the current position of the player"
     usage: "§c/tsetpoint <x> <y> <z> <name>"
-    aliases: [tsetpoint]
+    aliases: [ tsetpoint ]
     permission: op.permission.node
     permission-message: "You do not have permission to use this command"
   tdeletepoint:
@@ -32,4 +32,4 @@ commands:
     permission: player.permission.node
     permission-message: "You do not have permission to use this command"
 
-softdepend: [BlueMap]
+softdepend: [ BlueMap ]

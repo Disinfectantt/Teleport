@@ -12,15 +12,20 @@ import xyz.cringee.menu.events.clickEvent;
 import xyz.cringee.menu.events.onPlayerJoinEvent;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
-public class Main extends JavaPlugin{
+public class Main extends JavaPlugin {
+    private final Json json = new Json();
+    private final Config config = new Config();
+    private final Logger logger = Logger.getLogger("Minecraft");
+
     @Override
     public void onEnable() {
         try {
-            Config.config();
-            Json.loadPoints();
-        }catch (IOException e){
-            Bukkit.getLogger().warning("Exception: " + e);
+            config.config();
+            json.loadPoints();
+        } catch (IOException e) {
+            logger.warning("Exception: " + e);
         }
         getCommand("tsetpoint").setExecutor(new setPoint());
         getCommand("tdeletepoint").setExecutor(new deletePoint());
@@ -28,15 +33,15 @@ public class Main extends JavaPlugin{
         Bukkit.getPluginManager().registerEvents(new clickEvent(), this);
         Bukkit.getPluginManager().registerEvents(new onPlayerJoinEvent(), this);
 
-        Bukkit.getLogger().info("Teleport enabled");
+        logger.info("Teleport enabled");
 
-        if(Config.getConfig().getBoolean("BlueMap")){
-            BlueMapAPIMarkers.markers();
+        if (config.getConfig().getBoolean("BlueMap")) {
+            BlueMapAPIMarkers.markersOnEnable();
         }
     }
 
     @Override
     public void onDisable() {
-        Bukkit.getLogger().info("Teleport disabled");
+        logger.info("Teleport disabled");
     }
 }

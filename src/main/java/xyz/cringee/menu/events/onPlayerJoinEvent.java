@@ -8,12 +8,13 @@ import xyz.cringee.models.PlayersPagination;
 import java.util.UUID;
 
 public class onPlayerJoinEvent implements Listener {
+    private static final PlayersPagination playersPagination = new PlayersPagination();
 
     @EventHandler
-    public void playerJoin(PlayerJoinEvent e){
+    public void playerJoin(PlayerJoinEvent e) {
         UUID uuid = e.getPlayer().getUniqueId();
-        if(!PlayersPagination.containsPlayer(uuid)){
-            PlayersPagination.setPageForPlayer(uuid, 0);
+        if (!playersPagination.containsPlayer(uuid)) {
+            playersPagination.setPageForPlayer(uuid, 0);
         }
     }
 
